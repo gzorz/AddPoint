@@ -1,0 +1,17 @@
+
+[general]
+name=AddPoint
+qgisMinimumVersion=3.16
+qgisMaximumVersion=3.99
+description=Panel za vnos koordinat WGS84 in dodajanje točk v nov ali obstoječi sloj.
+about=Enostaven panel, ki omogoča vnos geografskih koordinat (lon, lat v WGS84) in ustvarjanje novega scratch sloja ali dodajanje točk v obstoječe točkovne sloje projekta.
+version=1.0.0
+author=Grega Žorž
+email=
+tracker=
+repository=
+homepage=
+category=Vector
+icon=
+experimental=False
+deprecated=False
