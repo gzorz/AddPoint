@@ -1,6 +1,10 @@
+<img width="768" height="512" alt="image" src="https://github.com/user-attachments/assets/56a81d9c-d43b-4edf-bbd6-d17b79b6400f" />
+
 # AddPoint – Create Vector Layers from Coordinates (DD / DDM / DMS / EPSG:3794)
 
-AddPoint is a QGIS plugin that **creates vector layers from entered coordinates** and allows you to add points to any existing point layer. It supports multiple coordinate formats, automatic CRS transformation, smart validation, and a full Slovenian/English UI toggle.
+AddPoint is designed for everyday users who need the simplest possible way to create a point from a coordinate.
+Instead of dealing with complex dialogs or coordinate conversions, the plugin provides a clean, intuitive panel where the user simply enters a coordinate — in any common format — and instantly creates a point or an entire vector layer.
+AddPoint removes technical barriers and helps users who are not GIS experts quickly place accurate locations on the map, regardless of their familiarity with coordinate systems.
 
 ---
 ## Key Features
