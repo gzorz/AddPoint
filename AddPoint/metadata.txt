@@ -1,17 +1,22 @@
 
 [general]
 name=AddPoint
-qgisMinimumVersion=3.16
-qgisMaximumVersion=3.99
-description=Panel za vnos koordinat WGS84 in dodajanje točk v nov ali obstoječi sloj.
-about=Enostaven panel, ki omogoča vnos geografskih koordinat (lon, lat v WGS84) in ustvarjanje novega scratch sloja ali dodajanje točk v obstoječe točkovne sloje projekta.
-version=1.0.0
+display_name=Add Point
+version=0.1.0
+qgisMinimumVersion=3.22
 author=Grega Žorž
-email=
-tracker=
-repository=
-homepage=
-category=Vector
+email=gregazorz@gmail.com
+description=Create point features from user-entered coordinates through a simplified interface.
+about=AddPoint is designed for everyday users who need the simplest possible way to create a point from a coordinate. The plugin provides a clean, intuitive panel where the user enters a coordinate and immediately creates a point vector layer. The plugin removes technical barriers and enables users without GIS expertise to accurately place locations on the map, regardless of their familiarity with QGIS.
 icon=
+category=Vector
+tags=points,digitizing,editing,coordinates,vector
+plugin_license=MIT
 experimental=False
 deprecated=False
+homepage=https://github.com/gzorz/AddPoint
+repository=https://github.com/gzorz/AddPoint
+tracker=https://github.com/gzorz/AddPoint/issues
+hasProcessingProvider=False
+server=False
+changelog=0.1.0: Initial release.
