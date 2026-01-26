@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 def classFactory(iface):
-    """
-    Obvezen vstopni kavelj za QGIS; vrne instanco našega plugin-a.
-    """
+    """Vstopna točka za QGIS plugin."""
     from .AddPoint import AddPointPlugin
     return AddPointPlugin(iface)
