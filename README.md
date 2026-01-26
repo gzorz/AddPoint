@@ -1,4 +1,4 @@
-<img width="768" height="512" alt="image" src="https://github.com/user-attachments/assets/56a81d9c-d43b-4edf-bbd6-d17b79b6400f" />
+<p align="center"><img width="384" height="256" alt="image" src="https://github.com/user-attachments/assets/56a81d9c-d43b-4edf-bbd6-d17b79b6400f" /></p>
 
 # AddPoint – Create Vector Layers from Coordinates (DD / DDM / DMS / EPSG:3794)
 
@@ -7,6 +7,8 @@ Instead of dealing with complex dialogs or coordinate conversions, the plugin pr
 AddPoint removes technical barriers and helps users who are not GIS experts quickly place accurate locations on the map, regardless of their familiarity with coordinate systems.
 
 ---
+
+<p align="center"><img widgth="768" height="512" alt="image" src="https://github.com/gzorz/AddPoint/blob/main/addpoint.png" /></p>
 ## Key Features
 
 ### Create vector layers directly from coordinates
