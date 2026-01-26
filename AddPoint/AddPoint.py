@@ -1,10 +1,11 @@
 
 # -*- coding: utf-8 -*-
+import re
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtWidgets import (
     QAction, QDockWidget, QWidget, QVBoxLayout, QHBoxLayout, QFormLayout,
-    QLabel, QLineEdit, QPushButton, QComboBox
+    QLabel, QLineEdit, QPushButton, QCheckBox, QComboBox
 )
 
 from qgis.core import (
@@ -16,7 +17,100 @@ from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
+    QgsMessageLog,
+    Qgis,
+    edit,
+    QgsMapLayerProxyModel
 )
+
+from qgis.gui import QgsMapLayerComboBox
+
+LANG = {
+    'sl': {
+        'plugin_title': 'AddPoint',
+        'toggle_lang': 'SLO/EN',
+        'format_label': 'Format / vnosni CRS:',
+        'format_dd': 'WGS84: Decimalne stopinje (DD)',
+        'format_ddm': 'WGS84: Stopinje in decimalne minute (DDM)',
+        'format_dms': 'WGS84: Stopinje, minute in sekunde (DMS)',
+        'format_3794': 'D96/TM – Slovenija (EPSG:3794, metri)',
+        'x_label_lon': 'Longitude (X):',
+        'y_label_lat': 'Latitude (Y):',
+        'x_label_easting': 'X (Easting) [m]:',
+        'y_label_northing': 'Y (Northing) [m]:',
+        'ph_dd_lon': 'npr. 14.50597 ali -14.50597',
+        'ph_dd_lat': 'npr. 46.05695 ali -46.05695',
+        'ph_ddm_lon': "npr. 14 30.3582 E ali 14°30.3582′",
+        'ph_ddm_lat': "npr. 46 03.417 N ali 46°3.417′",
+        'ph_dms_lon': "npr. 14 30 21.5 E ali 14°30′21.5″",
+        'ph_dms_lat': "npr. 46 03 25.0 N ali 46°3′25.0″",
+        'ph_3794_x': 'npr. 500000',
+        'ph_3794_y': 'npr. 5100000',
+        'btn_swap': 'Zamenjaj X ↔ Y',
+        'existing_layer_label': 'Obstoječi točkovni sloj:',
+        'btn_refresh_layers': 'Osveži seznam slojev',
+        'chk_add_after': 'Po ustvarjanju sloja takoj dodaj vneseno točko',
+        'btn_create': 'Ustvari točkovni sloj',
+        'btn_add': 'Dodaj točko v obstoječi sloj',
+        'msg_layer_created': 'Ustvarjen nov scratch sloj: {name}',
+        'warn_enter_both': 'Vnesi obe vrednosti (X in Y).',
+        'warn_no_point_layer': 'Ni izbranega točkovnega sloja.',
+        'warn_not_point_layer': 'Izbrani sloj ni točkovni vektorski sloj.',
+        'warn_range_lon': 'Longitude izven obsega [-180, 180].',
+        'warn_range_lat': 'Latitude izven obsega [-90, 90].',
+        'err_invalid_numeric_3794': 'Pričakovani numerični vrednosti v metrih za EPSG:3794.',
+        'warn_values_outside_3794': 'Opozorilo: vnesene vrednosti EPSG:3794 (X={x}, Y={y}) so izven tipičnega območja.',
+        'warn_parse_dd': 'Pričakovan format DD: npr. 14.50597 ali -14.50597',
+        'warn_parse_ddm': 'Pričakovan format DDM: stopinje minute.dec (npr. 14 30.3582 E)',
+        'warn_parse_dms': 'Pričakovan format DMS: stopinje minute sekunde (npr. 14 30 21.5 E)',
+        'err_transform': 'Neuspešna transformacija koordinat: {err}',
+        'err_add_feature': 'Dodajanje točke je spodletelo.',
+        'msg_point_added': 'Točka dodana v sloj: {layer}',
+        'err_mem_layer': 'Neuspešna tvorba memory sloja.'
+    },
+    'en': {
+        'plugin_title': 'AddPoint',
+        'toggle_lang': 'SLO/EN',
+        'format_label': 'Format / input CRS:',
+        'format_dd': 'WGS84: Decimal degrees (DD)',
+        'format_ddm': 'WGS84: Degrees and decimal minutes (DDM)',
+        'format_dms': 'WGS84: Degrees, minutes and seconds (DMS)',
+        'format_3794': 'D96/TM – Slovenia (EPSG:3794, meters)',
+        'x_label_lon': 'Longitude (X):',
+        'y_label_lat': 'Latitude (Y):',
+        'x_label_easting': 'X (Easting) [m]:',
+        'y_label_northing': 'Y (Northing) [m]:',
+        'ph_dd_lon': 'e.g. 14.50597 or -14.50597',
+        'ph_dd_lat': 'e.g. 46.05695 or -46.05695',
+        'ph_ddm_lon': "e.g. 14 30.3582 E or 14°30.3582′",
+        'ph_ddm_lat': "e.g. 46 03.417 N or 46°3.417′",
+        'ph_dms_lon': "e.g. 14 30 21.5 E or 14°30′21.5″",
+        'ph_dms_lat': "e.g. 46 03 25.0 N or 46°3′25.0″",
+        'ph_3794_x': 'e.g. 500000',
+        'ph_3794_y': 'e.g. 5100000',
+        'btn_swap': 'Swap X ↔ Y',
+        'existing_layer_label': 'Existing point layer:',
+        'btn_refresh_layers': 'Refresh layer list',
+        'chk_add_after': 'After creating layer, immediately add the entered point',
+        'btn_create': 'Create point layer',
+        'btn_add': 'Add point to existing layer',
+        'msg_layer_created': 'Created new scratch layer: {name}',
+        'warn_enter_both': 'Enter both values (X and Y).',
+        'warn_no_point_layer': 'No point layer selected.',
+        'warn_not_point_layer': 'The selected layer is not a point vector layer.',
+        'warn_range_lon': 'Longitude out of range [-180, 180].',
+        'warn_range_lat': 'Latitude out of range [-90, 90].',
+        'err_invalid_numeric_3794': 'Expected numeric values in meters for EPSG:3794.',
+        'warn_values_outside_3794': 'Warning: EPSG:3794 values (X={x}, Y={y}) are outside typical range.',
+        'warn_parse_dd': 'Expected DD format: e.g. 14.50597 or -14.50597',
+        'warn_parse_ddm': 'Expected DDM format: degrees minutes.dec (e.g. 14 30.3582 E)',
+        'warn_parse_dms': 'Expected DMS format: degrees minutes seconds (e.g. 14 30 21.5 E)',
+        'err_transform': 'Coordinate transformation failed: {err}',
+        'err_add_feature': 'Adding point failed.',
+        'msg_point_added': 'Point added to layer: {layer}',
+        'err_mem_layer': 'Failed to create memory layer.'
+    }
+}
 
 class AddPointPlugin:
     def __init__(self, iface):
@@ -27,42 +121,36 @@ class AddPointPlugin:
         self._layers_combo = None
         self._lon_edit = None
         self._lat_edit = None
+        self._x_label = None
+        self._y_label = None
+        self._format_combo = None
+        self._add_to_new_after_create = None
+        self._btn_create = None
+        self._btn_add = None
+        self._btn_swap = None
+        self._btn_refresh = None
+        self._fmt_label = None
+        self._existing_label = None
+        self._lang_btn = None
+        self._lang = 'sl'  # privzeto slovensko
 
     # ----------------------------
-    # QGIS plugin lifecycle
+    # QGIS lifecycle
     # ----------------------------
     def initGui(self):
-        # Akcija za vklop/izklop panela
         self._action = QAction("AddPoint panel", self.iface.mainWindow())
         self._action.setCheckable(True)
         self._action.setChecked(True)
         self._action.triggered.connect(self._toggle_dock)
 
-        # Dodaj v meni in orodno vrstico (Plugins)
         self.iface.addPluginToMenu("AddPoint", self._action)
         self.iface.addToolBarIcon(self._action)
 
-        # Ustvari in prikaži dock/panel
         self._create_dock()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self._dock)
         self._action.setChecked(True)
 
-        # Posodabljaj seznam slojev ob spremembah v projektu
-        QgsProject.instance().layersAdded.connect(self._populate_layers_combo)
-        QgsProject.instance().layersRemoved.connect(self._populate_layers_combo)
-
     def unload(self):
-        # Odklopi signale (varno, tudi če niso povezani)
-        try:
-            QgsProject.instance().layersAdded.disconnect(self._populate_layers_combo)
-        except Exception:
-            pass
-        try:
-            QgsProject.instance().layersRemoved.disconnect(self._populate_layers_combo)
-        except Exception:
-            pass
-
-        # Odstrani GUI elemente
         if self._action:
             self.iface.removeToolBarIcon(self._action)
             self.iface.removePluginMenu("AddPoint", self._action)
@@ -76,179 +164,347 @@ class AddPointPlugin:
     # UI
     # ----------------------------
     def _create_dock(self):
-        self._dock = QDockWidget("AddPoint", self.iface.mainWindow())
+        self._dock = QDockWidget(LANG[self._lang]['plugin_title'], self.iface.mainWindow())
         self._dock.setObjectName("AddPointDock")
         self._dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
 
         container = QWidget(self._dock)
         vbox = QVBoxLayout(container)
 
-        # Vnos koordinat (WGS84 lon, lat)
+        # Vrstica z jezikom in formatom
+        top_row = QHBoxLayout()
+        self._lang_btn = QPushButton(LANG[self._lang]['toggle_lang'])
+        self._lang_btn.setToolTip('SLO/EN')
+        self._lang_btn.clicked.connect(self._toggle_language)
+        top_row.addWidget(self._lang_btn)
+
+        self._fmt_label = QLabel(LANG[self._lang]['format_label'])
+        self._format_combo = QComboBox()
+        self._rebuild_format_combo()
+        self._format_combo.currentIndexChanged.connect(self._on_format_changed)
+        top_row.addWidget(self._fmt_label)
+        top_row.addWidget(self._format_combo)
+        vbox.addLayout(top_row)
+
+        # Vnos koordinat
         form = QFormLayout()
         self._lon_edit = QLineEdit()
         self._lat_edit = QLineEdit()
-        self._lon_edit.setPlaceholderText("npr. 14.50597")
-        self._lat_edit.setPlaceholderText("npr. 46.05695")
-
-        # Dovoljene vrednosti (lon: -180..180, lat: -90..90)
-        lon_validator = QDoubleValidator(-180.0, 180.0, 8)
-        lat_validator = QDoubleValidator(-90.0, 90.0, 8)
-        self._lon_edit.setValidator(lon_validator)
-        self._lat_edit.setValidator(lat_validator)
-
-        form.addRow(QLabel("Longitude (X) [WGS84]:"), self._lon_edit)
-        form.addRow(QLabel("Latitude (Y) [WGS84]:"), self._lat_edit)
+        self._x_label = QLabel()
+        self._y_label = QLabel()
+        form.addRow(self._x_label, self._lon_edit)
+        form.addRow(self._y_label, self._lat_edit)
         vbox.addLayout(form)
 
-        # Izbira obstoječega točkovnega sloja
-        self._layers_combo = QComboBox()
-        self._layers_combo.setToolTip("Izberi točkovni sloj, kamor želiš dodati točko.")
-        vbox.addWidget(QLabel("Obstoječi točkovni sloj:"))
+        # Gumb zamenjave X/Y
+        swap_row = QHBoxLayout()
+        self._btn_swap = QPushButton()
+        self._btn_swap.clicked.connect(self._on_swap_values)
+        swap_row.addWidget(self._btn_swap)
+        vbox.addLayout(swap_row)
+
+        # Seznam slojev
+        self._existing_label = QLabel()
+        vbox.addWidget(self._existing_label)
+        self._layers_combo = QgsMapLayerComboBox()
+        self._layers_combo.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self._layers_combo.setAllowEmptyLayer(True)
         vbox.addWidget(self._layers_combo)
 
-        # Gumbi
+        # Osveži sloje
+        refresh_row = QHBoxLayout()
+        self._btn_refresh = QPushButton()
+        self._btn_refresh.clicked.connect(self._refresh_layers_combo)
+        refresh_row.addWidget(self._btn_refresh)
+        vbox.addLayout(refresh_row)
+
+        # Checkbox: dodaj po ustvarjanju
+        self._add_to_new_after_create = QCheckBox()
+        self._add_to_new_after_create.setChecked(True)
+        vbox.addWidget(self._add_to_new_after_create)
+
+        # Gumbi akcij
         btn_row = QHBoxLayout()
-        create_btn = QPushButton("Create point layer")
-        add_btn = QPushButton("Add point to existing layer")
-        btn_row.addWidget(create_btn)
-        btn_row.addWidget(add_btn)
+        self._btn_create = QPushButton()
+        self._btn_add = QPushButton()
+        self._btn_create.clicked.connect(self._on_create_layer)
+        self._btn_add.clicked.connect(self._on_add_point)
+        btn_row.addWidget(self._btn_create)
+        btn_row.addWidget(self._btn_add)
         vbox.addLayout(btn_row)
 
-        # Povezave
-        create_btn.clicked.connect(self._on_create_layer)
-        add_btn.clicked.connect(self._on_add_point)
+        # Uporabi lokalizacijo
+        self._apply_validators()
+        self._set_placeholders(self._current_format())
+        self._apply_localization()
 
-        # Zaključi
         container.setLayout(vbox)
         self._dock.setWidget(container)
 
-        # Napolni seznam slojev
-        self._populate_layers_combo()
+    def _rebuild_format_combo(self):
+        # ohrani trenutno izbiro preko userData
+        current_code = self._format_combo.currentData() if self._format_combo.count() > 0 else 'DD'
+        self._format_combo.blockSignals(True)
+        self._format_combo.clear()
+        self._format_combo.addItem(LANG[self._lang]['format_dd'], userData='DD')
+        self._format_combo.addItem(LANG[self._lang]['format_ddm'], userData='DDM')
+        self._format_combo.addItem(LANG[self._lang]['format_dms'], userData='DMS')
+        self._format_combo.addItem(LANG[self._lang]['format_3794'], userData='EPSG:3794')
+        # ponovno nastavi indeks glede na kodo
+        idx = 0
+        for i in range(self._format_combo.count()):
+            if self._format_combo.itemData(i) == current_code:
+                idx = i
+                break
+        self._format_combo.setCurrentIndex(idx)
+        self._format_combo.blockSignals(False)
+
+    def _apply_localization(self):
+        L = LANG[self._lang]
+        self._dock.setWindowTitle(L['plugin_title'])
+        self._action.setText(f"{L['plugin_title']} panel")
+        self._fmt_label.setText(L['format_label'])
+        self._btn_swap.setText(L['btn_swap'])
+        self._existing_label.setText(L['existing_layer_label'])
+        self._btn_refresh.setText(L['btn_refresh_layers'])
+        self._add_to_new_after_create.setText(L['chk_add_after'])
+        self._btn_create.setText(L['btn_create'])
+        self._btn_add.setText(L['btn_add'])
+        # osveži labele in placeholders glede na format
+        self._set_placeholders(self._current_format())
+        # rebuild format combo z lokaliziranimi nizi
+        self._rebuild_format_combo()
+
+    def _toggle_language(self):
+        self._lang = 'en' if self._lang == 'sl' else 'sl'
+        self._apply_localization()
+
+    def _refresh_layers_combo(self):
+        current = self._layers_combo.currentLayer()
+        self._layers_combo.setFilters(QgsMapLayerProxyModel.PointLayer)
+        if current is not None:
+            try:
+                self._layers_combo.setLayer(current)
+            except Exception:
+                pass
+
+    def _apply_validators(self):
+        fmt = self._current_format()
+        if fmt == 'DD':
+            lon_validator = QDoubleValidator(-180.0, 180.0, 8)
+            lat_validator = QDoubleValidator(-90.0, 90.0, 8)
+            self._lon_edit.setValidator(lon_validator)
+            self._lat_edit.setValidator(lat_validator)
+        elif fmt in ('DDM', 'DMS'):
+            self._lon_edit.setValidator(None)
+            self._lat_edit.setValidator(None)
+        else:
+            metric_validator = QDoubleValidator(-1e8, 1e8, 3)
+            self._lon_edit.setValidator(metric_validator)
+            self._lat_edit.setValidator(metric_validator)
+
+    def _set_placeholders(self, fmt):
+        L = LANG[self._lang]
+        if fmt == 'DD':
+            self._x_label.setText(L['x_label_lon'])
+            self._y_label.setText(L['y_label_lat'])
+            self._lon_edit.setPlaceholderText(L['ph_dd_lon'])
+            self._lat_edit.setPlaceholderText(L['ph_dd_lat'])
+        elif fmt == 'DDM':
+            self._x_label.setText(L['x_label_lon'])
+            self._y_label.setText(L['y_label_lat'])
+            self._lon_edit.setPlaceholderText(L['ph_ddm_lon'])
+            self._lat_edit.setPlaceholderText(L['ph_ddm_lat'])
+        elif fmt == 'DMS':
+            self._x_label.setText(L['x_label_lon'])
+            self._y_label.setText(L['y_label_lat'])
+            self._lon_edit.setPlaceholderText(L['ph_dms_lon'])
+            self._lat_edit.setPlaceholderText(L['ph_dms_lat'])
+        else:
+            self._x_label.setText(L['x_label_easting'])
+            self._y_label.setText(L['y_label_northing'])
+            self._lon_edit.setPlaceholderText(L['ph_3794_x'])
+            self._lat_edit.setPlaceholderText(L['ph_3794_y'])
+        self._apply_validators()
+
+    def _on_format_changed(self, idx):
+        self._set_placeholders(self._current_format())
+
+    def _current_format(self):
+        return self._format_combo.currentData()
 
     def _toggle_dock(self, checked):
-        if not self._dock:
-            return
-        self._dock.setVisible(checked)
+        if self._dock:
+            self._dock.setVisible(checked)
 
     # ----------------------------
     # Logika
     # ----------------------------
-    def _parse_inputs(self):
-        """Vrne (lon, lat) kot float ali sproži ValueError."""
-        lon_text = (self._lon_edit.text() or "").strip().replace(",", ".")
-        lat_text = (self._lat_edit.text() or "").strip().replace(",", ".")
-        if lon_text == "" or lat_text == "":
-            raise ValueError("Vnesi obe vrednosti: longitude in latitude.")
-        lon = float(lon_text)
-        lat = float(lat_text)
-        if lon < -180 or lon > 180 or lat < -90 or lat > 90:
-            raise ValueError("Koordinate izven obsega: lon ∈ [-180, 180], lat ∈ [-90, 90].")
-        return lon, lat
+    def _on_swap_values(self):
+        x = self._lon_edit.text()
+        y = self._lat_edit.text()
+        self._lon_edit.setText(y)
+        self._lat_edit.setText(x)
 
-    def _populate_layers_combo(self, *args, **kwargs):
-        """Napolni combobox s točkovnimi vektorskimi sloji v projektu."""
-        if not self._layers_combo:
-            return
-        self._layers_combo.blockSignals(True)
-        self._layers_combo.clear()
-        project = QgsProject.instance()
-        for layer in project.mapLayers().values():
+    def _parse_inputs(self):
+        L = LANG[self._lang]
+        fmt = self._current_format()
+        x_text = (self._lon_edit.text() or '').strip()
+        y_text = (self._lat_edit.text() or '').strip()
+        if x_text == '' or y_text == '':
+            raise ValueError(L['warn_enter_both'])
+
+        if fmt in ('DD', 'DDM', 'DMS'):
+            lon = self._parse_angle(x_text, kind='lon', fmt=fmt)
+            lat = self._parse_angle(y_text, kind='lat', fmt=fmt)
+            if lon < -180 or lon > 180:
+                raise ValueError(L['warn_range_lon'])
+            if lat < -90 or lat > 90:
+                raise ValueError(L['warn_range_lat'])
+            return lon, lat, 'EPSG:4326'
+        else:
             try:
-                if hasattr(layer, "geometryType") and layer.geometryType() == QgsWkbTypes.PointGeometry:
-                    self._layers_combo.addItem(layer.name(), layer.id())
+                x = float(x_text.replace(',', '.'))
+                y = float(y_text.replace(',', '.'))
             except Exception:
-                continue
-        self._layers_combo.blockSignals(False)
+                raise ValueError(L['err_invalid_numeric_3794'])
+            if not (300000 <= x <= 800000 and 4000000 <= y <= 6000000):
+                QgsMessageLog.logMessage(L['warn_values_outside_3794'].format(x=x, y=y), 'AddPoint', Qgis.Warning)
+            return x, y, 'EPSG:3794'
+
+    def _normalize_angle_text(self, s_up: str) -> str:
+        s_up = (s_up
+                .replace('’', "'")
+                .replace('′', "'")
+                .replace('“', '"')
+                .replace('”', '"')
+                .replace('″', '"'))
+        s_up = re.sub(r"''", '"', s_up)
+        s_up = s_up.replace('°', ' ').replace("'", ' ').replace('"', ' ')
+        s_up = re.sub(r'[;:,]', ' ', s_up)
+        s_up = re.sub(r'\s+', ' ', s_up).strip()
+        return s_up
+
+    def _parse_angle(self, text, kind='lon', fmt='DD'):
+        L = LANG[self._lang]
+        s_up = text.strip().upper().replace(',', '.')
+        hemi_match = re.findall(r'[NSEW]', s_up)
+        hemi = hemi_match[-1] if hemi_match else None
+        s_up = re.sub(r'[NSEW]', '', s_up)
+        s_up = self._normalize_angle_text(s_up)
+        tokens = s_up.split()
+        nums = []
+        for t in tokens:
+            try:
+                nums.append(float(t))
+            except Exception:
+                pass
+
+        if fmt == 'DD':
+            if len(nums) < 1:
+                raise ValueError(L['warn_parse_dd'])
+            deg = nums[0]
+            minutes = seconds = 0.0
+        elif fmt == 'DDM':
+            if len(nums) < 2:
+                raise ValueError(L['warn_parse_ddm'])
+            deg, minutes = nums[0], nums[1]
+            seconds = 0.0
+            if not (0 <= abs(minutes) < 60):
+                raise ValueError('Minute [0, 60).')
+        else:
+            if len(nums) < 3:
+                raise ValueError(L['warn_parse_dms'])
+            deg, minutes, seconds = nums[0], nums[1], nums[2]
+            if not (0 <= abs(minutes) < 60):
+                raise ValueError('Minute [0, 60).')
+            if not (0 <= abs(seconds) < 60):
+                raise ValueError('Sekunde [0, 60).')
+
+        sign = 1
+        if deg < 0:
+            sign *= -1
+            deg = abs(deg)
+        if kind == 'lon' and hemi in ('W',):
+            sign = -1
+        if kind == 'lat' and hemi in ('S',):
+            sign = -1
+        if kind == 'lon' and hemi in ('E',):
+            sign = +1 if sign > 0 else -1
+        if kind == 'lat' and hemi in ('N',):
+            sign = +1 if sign > 0 else -1
+
+        value = deg + (abs(minutes) / 60.0) + (abs(seconds) / 3600.0)
+        value *= sign
+
+        max_deg = 180 if kind == 'lon' else 90
+        if deg > max_deg or (deg == max_deg and (abs(minutes) > 0 or abs(seconds) > 0)):
+            raise ValueError('Stopinje presegajo dovoljene meje.')
+        return value
 
     def _on_create_layer(self):
-        """Ustvari nov scratch (memory) točkovni sloj v EPSG:4326 in ga doda v projekt."""
-        layer_name = "AddPoint_Scratch"
-        uri = "Point?crs=EPSG:4326"
-        mem_layer = QgsVectorLayer(uri, layer_name, "memory")
-        if not mem_layer or not mem_layer.isValid():
-            self._message("Neuspešna tvorba memory sloja.", level="critical")
-            return
-
-        QgsProject.instance().addMapLayer(mem_layer)
-        self._message(f"Ustvarjen nov scratch sloj: {layer_name}", level="info")
-        # Osveži in izberi pravkar ustvarjen sloj
-        self._populate_layers_combo()
-        idx = self._layers_combo.findText(layer_name)
-        if idx >= 0:
-            self._layers_combo.setCurrentIndex(idx)
-
-    def _on_add_point(self):
-        """Doda vneseno WGS84 točko v izbran obstoječi točkovni sloj (s transformacijo v CRS sloja)."""
-        # Preberi koordinate
+        L = LANG[self._lang]
         try:
-            lon, lat = self._parse_inputs()
+            layer_name = 'AddPoint_Scratch'
+            mem_layer = QgsVectorLayer('Point?crs=EPSG:4326', layer_name, 'memory')
+            if not mem_layer or not mem_layer.isValid():
+                raise RuntimeError(L['err_mem_layer'])
+            QgsProject.instance().addMapLayer(mem_layer)
+            self._message(L['msg_layer_created'].format(name=layer_name), level='info')
+            if self._add_to_new_after_create.isChecked():
+                self._on_add_point(target_layer=mem_layer)
         except Exception as ex:
-            self._message(str(ex), level="warning")
+            self._message(str(ex), level='critical')
+            QgsMessageLog.logMessage(f"_on_create_layer exception: {ex}", 'AddPoint', Qgis.Critical)
+
+    def _on_add_point(self, target_layer=None):
+        L = LANG[self._lang]
+        try:
+            x, y, src_epsg = self._parse_inputs()
+        except Exception as ex:
+            self._message(str(ex), level='warning')
+            QgsMessageLog.logMessage(f"Parse inputs failed: {ex}", 'AddPoint', Qgis.Warning)
             return
 
-        # Dobi ciljni sloj
-        idx = self._layers_combo.currentIndex()
-        if idx < 0:
-            self._message("Ni izbranega točkovnega sloja.", level="warning")
-            return
-        layer_id = self._layers_combo.itemData(idx)
-        layer = QgsProject.instance().mapLayer(layer_id)
+        layer = target_layer or self._layers_combo.currentLayer()
         if layer is None:
-            self._message("Izbrani sloj ne obstaja več.", level="warning")
-            self._populate_layers_combo()
+            self._message(L['warn_no_point_layer'], level='warning')
             return
 
-        # Preveri geometrijo
-        if not hasattr(layer, "geometryType") or layer.geometryType() != QgsWkbTypes.PointGeometry:
-            self._message("Izbrani sloj ni točkovni sloj.", level="warning")
+        if not isinstance(layer, QgsVectorLayer) or layer.geometryType() != QgsWkbTypes.PointGeometry:
+            self._message(L['warn_not_point_layer'], level='warning')
             return
 
-        # Pripravi geometrijo v CRS sloja (transformacija iz WGS84)
-        src_crs = QgsCoordinateReferenceSystem("EPSG:4326")
-        dst_crs = layer.crs()
         try:
+            src_crs = QgsCoordinateReferenceSystem(src_epsg)
+            dst_crs = layer.crs()
             xform = QgsCoordinateTransform(src_crs, dst_crs, QgsProject.instance())
-            pt_dst = xform.transform(QgsPointXY(lon, lat))
+            pt_dst = xform.transform(QgsPointXY(x, y))
         except Exception as ex:
-            self._message(f"Neuspešna transformacija koordinat: {ex}", level="critical")
+            self._message(L['err_transform'].format(err=ex), level='critical')
+            QgsMessageLog.logMessage(f"Transform failed: {ex}", 'AddPoint', Qgis.Critical)
             return
 
-        feat = QgsFeature(layer.fields())
-        feat.setGeometry(QgsGeometry.fromPointXY(pt_dst))
-
-        # Dodajanje v sloj (z urejanjem, če je potrebno)
-        must_commit = False
-        if not layer.isEditable():
-            if not layer.startEditing():
-                self._message("Sloja ni možno dati v urejanje.", level="critical")
-                return
-            must_commit = True
-
-        ok = layer.addFeature(feat)
-        if not ok:
-            self._message("Dodajanje točke je spodletelo.", level="critical")
-            if must_commit:
-                layer.rollBack()
+        try:
+            feat = QgsFeature(layer.fields())
+            feat.setGeometry(QgsGeometry.fromPointXY(pt_dst))
+            with edit(layer):
+                ok = layer.addFeature(feat)
+                if not ok:
+                    raise RuntimeError(L['err_add_feature'])
+        except Exception as ex:
+            self._message(str(ex), level='critical')
+            QgsMessageLog.logMessage(f"Add feature failed: {ex}", 'AddPoint', Qgis.Critical)
             return
 
-        if must_commit:
-            if not layer.commitChanges():
-                self._message("Shranjevanje sprememb je spodletelo.", level="critical")
-                layer.rollBack()
-                return
+        self._message(L['msg_point_added'].format(layer=layer.name()), level='info')
+        try:
+            layer.triggerRepaint()
+        except Exception:
+            pass
 
-        self._message(f"Točka dodana v sloj: {layer.name()}", level="info")
-        layer.triggerRepaint()
-
-    # ----------------------------
-    # Pomožne metode
-    # ----------------------------
-    def _message(self, text, level="info", duration=4):
+    def _message(self, text, level='info', duration=5):
         bar = self.iface.messageBar()
-        from qgis.core import Qgis
-        levels = {
-            "info": Qgis.Info,
-            "warning": Qgis.Warning,
-            "critical": Qgis.Critical
-        }
-        bar.pushMessage("AddPoint", text, level=levels.get(level, Qgis.Info), duration=duration)
+        levels = {"info": Qgis.Info, "warning": Qgis.Warning, "critical": Qgis.Critical}
+        bar.pushMessage('AddPoint', text, level=levels.get(level, Qgis.Info), duration=duration)
+        QgsMessageLog.logMessage(text, 'AddPoint', levels.get(level, Qgis.Info))
