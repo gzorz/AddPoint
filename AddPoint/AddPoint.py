@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 import re
 from qgis.PyQt.QtCore import Qt
@@ -34,32 +33,44 @@ LANG = {
         'format_ddm': 'WGS84: Stopinje in decimalne minute (DDM)',
         'format_dms': 'WGS84: Stopinje, minute in sekunde (DMS)',
         'format_3794': 'D96/TM – Slovenija (EPSG:3794, metri)',
-        'x_label_lon': 'Longitude (X):',
-        'y_label_lat': 'Latitude (Y):',
-        'x_label_easting': 'X (Easting) [m]:',
-        'y_label_northing': 'Y (Northing) [m]:',
-        'ph_dd_lon': 'npr. 14.50597 ali -14.50597',
-        'ph_dd_lat': 'npr. 46.05695 ali -46.05695',
-        'ph_ddm_lon': "npr. 14 30.3582 E ali 14°30.3582′",
-        'ph_ddm_lat': "npr. 46 03.417 N ali 46°3.417′",
-        'ph_dms_lon': "npr. 14 30 21.5 E ali 14°30′21.5″",
-        'ph_dms_lat': "npr. 46 03 25.0 N ali 46°3′25.0″",
-        'ph_3794_x': 'npr. 500000',
-        'ph_3794_y': 'npr. 5100000',
-        'btn_swap': 'Zamenjaj X ↔ Y',
+        'format_3857': 'Web Mercator (EPSG:3857, metri)',
+        'format_utm': 'UTM',
+
+        # Vnosni način
+        'input_mode_single': 'Vnos v enem polju (E N)',
+        'single_label': 'Koordinate:',
+        'single_order_label': 'Vrstni red:',
+        'single_order_en': 'E N',
+        'single_order_ne': 'N E',
+
+        # Labele: samo E in N
+        'e_label': 'E:',
+        'n_label': 'N:',
+
+        # UTM zona
+        'utm_zone_label': 'UTM cona:',
+
+        'btn_swap': 'Zamenjaj E ↔ N',
         'existing_layer_label': 'Obstoječi točkovni sloj:',
         'btn_refresh_layers': 'Osveži seznam slojev',
         'chk_add_after': 'Po ustvarjanju sloja takoj dodaj vneseno točko',
         'btn_create': 'Ustvari točkovni sloj',
         'btn_add': 'Dodaj točko v obstoječi sloj',
         'msg_layer_created': 'Ustvarjen nov scratch sloj: {name}',
-        'warn_enter_both': 'Vnesi obe vrednosti (X in Y).',
+
+        'warn_enter_both': 'Vnesi obe vrednosti (E in N).',
+        'warn_enter_two_single': 'Vnesi dve vrednosti v enem polju (npr. "E N" ali "N E").',
+
         'warn_no_point_layer': 'Ni izbranega točkovnega sloja.',
         'warn_not_point_layer': 'Izbrani sloj ni točkovni vektorski sloj.',
         'warn_range_lon': 'Longitude izven obsega [-180, 180].',
         'warn_range_lat': 'Latitude izven obsega [-90, 90].',
-        'err_invalid_numeric_3794': 'Pričakovani numerični vrednosti v metrih za EPSG:3794.',
-        'warn_values_outside_3794': 'Opozorilo: vnesene vrednosti EPSG:3794 (X={x}, Y={y}) so izven tipičnega območja.',
+
+        'err_invalid_numeric_metric': 'Pričakovani numerični vrednosti.',
+        'warn_values_outside_3794': 'Opozorilo: vnesene vrednosti EPSG:3794 (E={x}, N={y}) so izven tipičnega območja.',
+        'warn_values_outside_3857': 'Opozorilo: vnesene vrednosti EPSG:3857 (E={x}, N={y}) so izven tipičnega območja.',
+        'warn_values_outside_utm': 'Opozorilo: vnesene UTM vrednosti (E={x}, N={y}) so izven tipičnega območja.',
+
         'warn_parse_dd': 'Pričakovan format DD: npr. 14.50597 ali -14.50597',
         'warn_parse_ddm': 'Pričakovan format DDM: stopinje minute.dec (npr. 14 30.3582 E)',
         'warn_parse_dms': 'Pričakovan format DMS: stopinje minute sekunde (npr. 14 30 21.5 E)',
@@ -76,32 +87,44 @@ LANG = {
         'format_ddm': 'WGS84: Degrees and decimal minutes (DDM)',
         'format_dms': 'WGS84: Degrees, minutes and seconds (DMS)',
         'format_3794': 'D96/TM – Slovenia (EPSG:3794, meters)',
-        'x_label_lon': 'Longitude (X):',
-        'y_label_lat': 'Latitude (Y):',
-        'x_label_easting': 'X (Easting) [m]:',
-        'y_label_northing': 'Y (Northing) [m]:',
-        'ph_dd_lon': 'e.g. 14.50597 or -14.50597',
-        'ph_dd_lat': 'e.g. 46.05695 or -46.05695',
-        'ph_ddm_lon': "e.g. 14 30.3582 E or 14°30.3582′",
-        'ph_ddm_lat': "e.g. 46 03.417 N or 46°3.417′",
-        'ph_dms_lon': "e.g. 14 30 21.5 E or 14°30′21.5″",
-        'ph_dms_lat': "e.g. 46 03 25.0 N or 46°3′25.0″",
-        'ph_3794_x': 'e.g. 500000',
-        'ph_3794_y': 'e.g. 5100000',
-        'btn_swap': 'Swap X ↔ Y',
+        'format_3857': 'Web Mercator (EPSG:3857, meters)',
+        'format_utm': 'UTM',
+
+        # Input mode
+        'input_mode_single': 'Single-field input',
+        'single_label': 'Coordinates:',
+        'single_order_label': 'Order:',
+        'single_order_en': 'E N',
+        'single_order_ne': 'N E',
+
+        # Labels: E and N only
+        'e_label': 'E:',
+        'n_label': 'N:',
+
+        # UTM zone
+        'utm_zone_label': 'UTM zone:',
+
+        'btn_swap': 'Swap E ↔ N',
         'existing_layer_label': 'Existing point layer:',
         'btn_refresh_layers': 'Refresh layer list',
         'chk_add_after': 'After creating layer, immediately add the entered point',
         'btn_create': 'Create point layer',
         'btn_add': 'Add point to existing layer',
         'msg_layer_created': 'Created new scratch layer: {name}',
-        'warn_enter_both': 'Enter both values (X and Y).',
+
+        'warn_enter_both': 'Enter both values (E and N).',
+        'warn_enter_two_single': 'Enter two values in one field (e.g. "E N" or "N E").',
+
         'warn_no_point_layer': 'No point layer selected.',
         'warn_not_point_layer': 'The selected layer is not a point vector layer.',
         'warn_range_lon': 'Longitude out of range [-180, 180].',
         'warn_range_lat': 'Latitude out of range [-90, 90].',
-        'err_invalid_numeric_3794': 'Expected numeric values in meters for EPSG:3794.',
-        'warn_values_outside_3794': 'Warning: EPSG:3794 values (X={x}, Y={y}) are outside typical range.',
+
+        'err_invalid_numeric_metric': 'Expected numeric values.',
+        'warn_values_outside_3794': 'Warning: EPSG:3794 values (E={x}, N={y}) are outside typical range.',
+        'warn_values_outside_3857': 'Warning: EPSG:3857 values (E={x}, N={y}) are outside typical range.',
+        'warn_values_outside_utm': 'Warning: UTM values (E={x}, N={y}) are outside typical range.',
+
         'warn_parse_dd': 'Expected DD format: e.g. 14.50597 or -14.50597',
         'warn_parse_ddm': 'Expected DDM format: degrees minutes.dec (e.g. 14 30.3582 E)',
         'warn_parse_dms': 'Expected DMS format: degrees minutes seconds (e.g. 14 30 21.5 E)',
@@ -112,6 +135,7 @@ LANG = {
     }
 }
 
+
 class AddPointPlugin:
     def __init__(self, iface):
         self.iface = iface
@@ -119,10 +143,24 @@ class AddPointPlugin:
         self._dock = None
         self._action = None
         self._layers_combo = None
-        self._lon_edit = None
-        self._lat_edit = None
+
+        # Two-field inputs (E, N)
+        self._lon_edit = None  # E
+        self._lat_edit = None  # N
         self._x_label = None
         self._y_label = None
+
+        # Single-field input
+        self._single_mode_chk = None
+        self._one_label = None
+        self._one_edit = None
+        self._single_order_label = None
+        self._single_order_combo = None
+
+        # UTM zone dropdown
+        self._utm_zone_label = None
+        self._utm_zone_combo = None
+
         self._format_combo = None
         self._add_to_new_after_create = None
         self._btn_create = None
@@ -132,7 +170,7 @@ class AddPointPlugin:
         self._fmt_label = None
         self._existing_label = None
         self._lang_btn = None
-        self._lang = 'sl'  # privzeto slovensko
+        self._lang = 'sl'  # default Slovenian
 
     # ----------------------------
     # QGIS lifecycle
@@ -171,7 +209,7 @@ class AddPointPlugin:
         container = QWidget(self._dock)
         vbox = QVBoxLayout(container)
 
-        # Vrstica z jezikom in formatom
+        # Top row: language + format
         top_row = QHBoxLayout()
         self._lang_btn = QPushButton(LANG[self._lang]['toggle_lang'])
         self._lang_btn.setToolTip('SLO/EN')
@@ -186,24 +224,54 @@ class AddPointPlugin:
         top_row.addWidget(self._format_combo)
         vbox.addLayout(top_row)
 
-        # Vnos koordinat
+        # Input mode checkbox
+        self._single_mode_chk = QCheckBox()
+        self._single_mode_chk.stateChanged.connect(self._on_input_mode_changed)
+        vbox.addWidget(self._single_mode_chk)
+
+        # UTM zone row (only visible when UTM)
+        utm_row = QHBoxLayout()
+        self._utm_zone_label = QLabel()
+        self._utm_zone_combo = QComboBox()
+        self._build_utm_zone_combo()
+        utm_row.addWidget(self._utm_zone_label)
+        utm_row.addWidget(self._utm_zone_combo)
+        vbox.addLayout(utm_row)
+
+        # Single-field order row (only visible when single-field)
+        order_row = QHBoxLayout()
+        self._single_order_label = QLabel()
+        self._single_order_combo = QComboBox()
+        order_row.addWidget(self._single_order_label)
+        order_row.addWidget(self._single_order_combo)
+        vbox.addLayout(order_row)
+
+        # Coordinate inputs
         form = QFormLayout()
+
+        # Single-field widgets
+        self._one_label = QLabel()
+        self._one_edit = QLineEdit()
+        form.addRow(self._one_label, self._one_edit)
+
+        # Two-field widgets
         self._lon_edit = QLineEdit()
         self._lat_edit = QLineEdit()
         self._x_label = QLabel()
         self._y_label = QLabel()
         form.addRow(self._x_label, self._lon_edit)
         form.addRow(self._y_label, self._lat_edit)
+
         vbox.addLayout(form)
 
-        # Gumb zamenjave X/Y
+        # Swap button (two-field only)
         swap_row = QHBoxLayout()
         self._btn_swap = QPushButton()
         self._btn_swap.clicked.connect(self._on_swap_values)
         swap_row.addWidget(self._btn_swap)
         vbox.addLayout(swap_row)
 
-        # Seznam slojev
+        # Layer selection
         self._existing_label = QLabel()
         vbox.addWidget(self._existing_label)
         self._layers_combo = QgsMapLayerComboBox()
@@ -211,19 +279,19 @@ class AddPointPlugin:
         self._layers_combo.setAllowEmptyLayer(True)
         vbox.addWidget(self._layers_combo)
 
-        # Osveži sloje
+        # Refresh layers
         refresh_row = QHBoxLayout()
         self._btn_refresh = QPushButton()
         self._btn_refresh.clicked.connect(self._refresh_layers_combo)
         refresh_row.addWidget(self._btn_refresh)
         vbox.addLayout(refresh_row)
 
-        # Checkbox: dodaj po ustvarjanju
+        # Checkbox: add after create
         self._add_to_new_after_create = QCheckBox()
         self._add_to_new_after_create.setChecked(True)
         vbox.addWidget(self._add_to_new_after_create)
 
-        # Gumbi akcij
+        # Action buttons
         btn_row = QHBoxLayout()
         self._btn_create = QPushButton()
         self._btn_add = QPushButton()
@@ -233,16 +301,15 @@ class AddPointPlugin:
         btn_row.addWidget(self._btn_add)
         vbox.addLayout(btn_row)
 
-        # Uporabi lokalizacijo
-        self._apply_validators()
-        self._set_placeholders(self._current_format())
+        # Apply localization + visibility + validators
         self._apply_localization()
+        self._on_format_changed(self._format_combo.currentIndex())
+        self._on_input_mode_changed()
 
         container.setLayout(vbox)
         self._dock.setWidget(container)
 
     def _rebuild_format_combo(self):
-        # ohrani trenutno izbiro preko userData
         current_code = self._format_combo.currentData() if self._format_combo.count() > 0 else 'DD'
         self._format_combo.blockSignals(True)
         self._format_combo.clear()
@@ -250,7 +317,9 @@ class AddPointPlugin:
         self._format_combo.addItem(LANG[self._lang]['format_ddm'], userData='DDM')
         self._format_combo.addItem(LANG[self._lang]['format_dms'], userData='DMS')
         self._format_combo.addItem(LANG[self._lang]['format_3794'], userData='EPSG:3794')
-        # ponovno nastavi indeks glede na kodo
+        self._format_combo.addItem(LANG[self._lang]['format_3857'], userData='EPSG:3857')
+        self._format_combo.addItem(LANG[self._lang]['format_utm'], userData='UTM')
+
         idx = 0
         for i in range(self._format_combo.count()):
             if self._format_combo.itemData(i) == current_code:
@@ -259,10 +328,54 @@ class AddPointPlugin:
         self._format_combo.setCurrentIndex(idx)
         self._format_combo.blockSignals(False)
 
+    def _build_utm_zone_combo(self):
+        self._utm_zone_combo.blockSignals(True)
+        self._utm_zone_combo.clear()
+
+        for z in range(1, 61):
+            epsg = f"EPSG:{32600 + z}"
+            self._utm_zone_combo.addItem(f"{z:02d}N ({epsg})", userData=epsg)
+
+        for z in range(1, 61):
+            epsg = f"EPSG:{32700 + z}"
+            self._utm_zone_combo.addItem(f"{z:02d}S ({epsg})", userData=epsg)
+
+        # default: 33N
+        default_epsg = "EPSG:32633"
+        for i in range(self._utm_zone_combo.count()):
+            if self._utm_zone_combo.itemData(i) == default_epsg:
+                self._utm_zone_combo.setCurrentIndex(i)
+                break
+
+        self._utm_zone_combo.blockSignals(False)
+
+    def _rebuild_single_order_combo(self):
+        """
+        Single-field order dropdown:
+          - E N (default)
+          - N E (Google Maps style)
+        userData: 'EN' or 'NE'
+        """
+        L = LANG[self._lang]
+        self._single_order_combo.blockSignals(True)
+        current = self._single_order_combo.currentData() if self._single_order_combo.count() > 0 else 'EN'
+        self._single_order_combo.clear()
+        self._single_order_combo.addItem(L['single_order_en'], userData='EN')
+        self._single_order_combo.addItem(L['single_order_ne'], userData='NE')
+        # restore selection
+        idx = 0
+        for i in range(self._single_order_combo.count()):
+            if self._single_order_combo.itemData(i) == current:
+                idx = i
+                break
+        self._single_order_combo.setCurrentIndex(idx)
+        self._single_order_combo.blockSignals(False)
+
     def _apply_localization(self):
         L = LANG[self._lang]
         self._dock.setWindowTitle(L['plugin_title'])
-        self._action.setText(f"{L['plugin_title']} panel")
+        if self._action:
+            self._action.setText(f"{L['plugin_title']} panel")
         self._fmt_label.setText(L['format_label'])
         self._btn_swap.setText(L['btn_swap'])
         self._existing_label.setText(L['existing_layer_label'])
@@ -270,9 +383,15 @@ class AddPointPlugin:
         self._add_to_new_after_create.setText(L['chk_add_after'])
         self._btn_create.setText(L['btn_create'])
         self._btn_add.setText(L['btn_add'])
-        # osveži labele in placeholders glede na format
-        self._set_placeholders(self._current_format())
-        # rebuild format combo z lokaliziranimi nizi
+
+        self._single_mode_chk.setText(L['input_mode_single'])
+        self._one_label.setText(L['single_label'])
+
+        self._utm_zone_label.setText(L['utm_zone_label'])
+        self._single_order_label.setText(L['single_order_label'])
+        self._rebuild_single_order_combo()
+
+        self._set_labels_and_placeholders(self._current_format())
         self._rebuild_format_combo()
 
     def _toggle_language(self):
@@ -288,13 +407,41 @@ class AddPointPlugin:
             except Exception:
                 pass
 
+    def _on_input_mode_changed(self):
+        single = self._single_mode_chk.isChecked()
+
+        # show/hide single-field controls
+        self._one_label.setVisible(single)
+        self._one_edit.setVisible(single)
+
+        self._single_order_label.setVisible(single)
+        self._single_order_combo.setVisible(single)
+
+        # show/hide two-field controls
+        self._x_label.setVisible(not single)
+        self._lon_edit.setVisible(not single)
+        self._y_label.setVisible(not single)
+        self._lat_edit.setVisible(not single)
+
+        self._btn_swap.setEnabled(not single)
+        self._btn_swap.setVisible(not single)
+
+        self._apply_validators()
+
     def _apply_validators(self):
         fmt = self._current_format()
+        single = self._single_mode_chk.isChecked()
+
+        if single:
+            # free-form (two numbers in one field)
+            self._one_edit.setValidator(None)
+            return
+
         if fmt == 'DD':
-            lon_validator = QDoubleValidator(-180.0, 180.0, 8)
-            lat_validator = QDoubleValidator(-90.0, 90.0, 8)
-            self._lon_edit.setValidator(lon_validator)
-            self._lat_edit.setValidator(lat_validator)
+            e_validator = QDoubleValidator(-180.0, 180.0, 8)
+            n_validator = QDoubleValidator(-90.0, 90.0, 8)
+            self._lon_edit.setValidator(e_validator)  # E
+            self._lat_edit.setValidator(n_validator)  # N
         elif fmt in ('DDM', 'DMS'):
             self._lon_edit.setValidator(None)
             self._lat_edit.setValidator(None)
@@ -303,32 +450,27 @@ class AddPointPlugin:
             self._lon_edit.setValidator(metric_validator)
             self._lat_edit.setValidator(metric_validator)
 
-    def _set_placeholders(self, fmt):
+    def _set_labels_and_placeholders(self, fmt):
         L = LANG[self._lang]
-        if fmt == 'DD':
-            self._x_label.setText(L['x_label_lon'])
-            self._y_label.setText(L['y_label_lat'])
-            self._lon_edit.setPlaceholderText(L['ph_dd_lon'])
-            self._lat_edit.setPlaceholderText(L['ph_dd_lat'])
-        elif fmt == 'DDM':
-            self._x_label.setText(L['x_label_lon'])
-            self._y_label.setText(L['y_label_lat'])
-            self._lon_edit.setPlaceholderText(L['ph_ddm_lon'])
-            self._lat_edit.setPlaceholderText(L['ph_ddm_lat'])
-        elif fmt == 'DMS':
-            self._x_label.setText(L['x_label_lon'])
-            self._y_label.setText(L['y_label_lat'])
-            self._lon_edit.setPlaceholderText(L['ph_dms_lon'])
-            self._lat_edit.setPlaceholderText(L['ph_dms_lat'])
-        else:
-            self._x_label.setText(L['x_label_easting'])
-            self._y_label.setText(L['y_label_northing'])
-            self._lon_edit.setPlaceholderText(L['ph_3794_x'])
-            self._lat_edit.setPlaceholderText(L['ph_3794_y'])
+        self._x_label.setText(L['e_label'])
+        self._y_label.setText(L['n_label'])
+
+        # Remove placeholders/hints
+        self._lon_edit.setPlaceholderText('')
+        self._lat_edit.setPlaceholderText('')
+        self._one_edit.setPlaceholderText('')
+
         self._apply_validators()
 
     def _on_format_changed(self, idx):
-        self._set_placeholders(self._current_format())
+        fmt = self._current_format()
+        self._set_labels_and_placeholders(fmt)
+
+        is_utm = (fmt == 'UTM')
+        self._utm_zone_label.setVisible(is_utm)
+        self._utm_zone_combo.setVisible(is_utm)
+
+        self._apply_validators()
 
     def _current_format(self):
         return self._format_combo.currentData()
@@ -338,7 +480,7 @@ class AddPointPlugin:
             self._dock.setVisible(checked)
 
     # ----------------------------
-    # Logika
+    # Logic
     # ----------------------------
     def _on_swap_values(self):
         x = self._lon_edit.text()
@@ -346,31 +488,72 @@ class AddPointPlugin:
         self._lon_edit.setText(y)
         self._lat_edit.setText(x)
 
+    def _split_single_field(self, s: str):
+        s = (s or '').strip()
+        if not s:
+            return None, None
+        s = re.sub(r'[;,]', ' ', s)
+        s = re.sub(r'\s+', ' ', s).strip()
+        parts = s.split(' ')
+        if len(parts) < 2:
+            return None, None
+        return parts[0].strip(), parts[1].strip()
+
     def _parse_inputs(self):
         L = LANG[self._lang]
         fmt = self._current_format()
-        x_text = (self._lon_edit.text() or '').strip()
-        y_text = (self._lat_edit.text() or '').strip()
-        if x_text == '' or y_text == '':
-            raise ValueError(L['warn_enter_both'])
+        single = self._single_mode_chk.isChecked()
+
+        if single:
+            a_text, b_text = self._split_single_field(self._one_edit.text())
+            if not a_text or not b_text:
+                raise ValueError(L['warn_enter_two_single'])
+
+            order = self._single_order_combo.currentData() or 'EN'
+            # EN: first=E, second=N
+            # NE: first=N, second=E (Google Maps style)
+            if order == 'NE':
+                x_text, y_text = b_text, a_text  # E = second, N = first
+            else:
+                x_text, y_text = a_text, b_text  # E = first, N = second
+        else:
+            x_text = (self._lon_edit.text() or '').strip()  # E
+            y_text = (self._lat_edit.text() or '').strip()  # N
+            if x_text == '' or y_text == '':
+                raise ValueError(L['warn_enter_both'])
 
         if fmt in ('DD', 'DDM', 'DMS'):
-            lon = self._parse_angle(x_text, kind='lon', fmt=fmt)
-            lat = self._parse_angle(y_text, kind='lat', fmt=fmt)
+            lon = self._parse_angle(x_text, kind='lon', fmt=fmt)  # E
+            lat = self._parse_angle(y_text, kind='lat', fmt=fmt)  # N
             if lon < -180 or lon > 180:
                 raise ValueError(L['warn_range_lon'])
             if lat < -90 or lat > 90:
                 raise ValueError(L['warn_range_lat'])
             return lon, lat, 'EPSG:4326'
-        else:
-            try:
-                x = float(x_text.replace(',', '.'))
-                y = float(y_text.replace(',', '.'))
-            except Exception:
-                raise ValueError(L['err_invalid_numeric_3794'])
+
+        try:
+            x = float(x_text.replace(',', '.'))
+            y = float(y_text.replace(',', '.'))
+        except Exception:
+            raise ValueError(L['err_invalid_numeric_metric'])
+
+        if fmt == 'EPSG:3794':
             if not (300000 <= x <= 800000 and 4000000 <= y <= 6000000):
                 QgsMessageLog.logMessage(L['warn_values_outside_3794'].format(x=x, y=y), 'AddPoint', Qgis.Warning)
             return x, y, 'EPSG:3794'
+
+        if fmt == 'EPSG:3857':
+            if not (-20037508.3428 <= x <= 20037508.3428 and -20037508.3428 <= y <= 20037508.3428):
+                QgsMessageLog.logMessage(L['warn_values_outside_3857'].format(x=x, y=y), 'AddPoint', Qgis.Warning)
+            return x, y, 'EPSG:3857'
+
+        if fmt == 'UTM':
+            zone_epsg = self._utm_zone_combo.currentData() or "EPSG:32633"
+            if not (100000 <= x <= 900000 and 0 <= y <= 10000000):
+                QgsMessageLog.logMessage(L['warn_values_outside_utm'].format(x=x, y=y), 'AddPoint', Qgis.Warning)
+            return x, y, zone_epsg
+
+        return x, y, 'EPSG:4326'
 
     def _normalize_angle_text(self, s_up: str) -> str:
         s_up = (s_up
@@ -419,7 +602,7 @@ class AddPointPlugin:
             if not (0 <= abs(minutes) < 60):
                 raise ValueError('Minute [0, 60).')
             if not (0 <= abs(seconds) < 60):
-                raise ValueError('Sekunde [0, 60).')
+                raise ValueError('Seconds [0, 60).')
 
         sign = 1
         if deg < 0:
@@ -439,7 +622,7 @@ class AddPointPlugin:
 
         max_deg = 180 if kind == 'lon' else 90
         if deg > max_deg or (deg == max_deg and (abs(minutes) > 0 or abs(seconds) > 0)):
-            raise ValueError('Stopinje presegajo dovoljene meje.')
+            raise ValueError('Degrees exceed allowed bounds.')
         return value
 
     def _on_create_layer(self):
