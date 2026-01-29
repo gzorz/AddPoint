@@ -21,6 +21,8 @@ AddPoint removes technical barriers and helps users who are not GIS experts quic
 - **DDM** – Degrees and Decimal Minutes (e.g. `14 30.3582 E`, `46°3.417′ N`)
 - **DMS** – Degrees, Minutes, Seconds (e.g. `45°34′57.1″ N`, `13°51′55.6″ E`)
 - **EPSG:3794** – D96/TM (Slovenian national grid, meters)
+- **UTM**
+- **Web Mercator**
 
 The parser accepts a wide range of symbols (° ′ ″ ’ '') and normalizes them automatically.
 
@@ -32,16 +34,13 @@ The parser accepts a wide range of symbols (° ′ ″ ’ '') and normalizes th
 ### SLO/EN language switch
 A single **SLO/EN** button updates all labels, tooltips, placeholders, warnings, errors, and messages.
 
-### Reliable point‑layer selection
-- Uses `QgsMapLayerComboBox` and `QgsMapLayerProxyModel.PointLayer`.
-- Shows only point layers.
-- Includes a manual *Refresh layer list* button.
-
 ### Smart tools
 - **Swap X ↔ Y** button
 - Precision validators for each format
 - Typical range check for EPSG:3794
 - Clear QGIS Message Bar notifications
+- swap N-E with E-N order
+- single or multi line input
 
 ---
 ## Installation
