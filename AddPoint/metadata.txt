@@ -2,7 +2,7 @@
 [general]
 name=AddPoint
 display_name=Add Point
-version=1.3.6
+version=1.3.7
 qgisMinimumVersion=3.22
 author=Grega Žorž
 email=gregazorz@gmail.com
@@ -20,4 +20,5 @@ tracker=https://github.com/gzorz/AddPoint/issues
 hasProcessingProvider=False
 server=False
 changelog=0.1.0: Initial release.
+
 
